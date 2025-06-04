@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Biweekly Pay Tracker</title>
+    <style>
+        body { font-family: sans-serif; padding: 20px; max-width: 600px; margin: auto; }
+        input, button { width: 100%; padding: 10px; margin: 5px 0; box-sizing: border-box; }
+        ul { padding-left: 0; list-style: none; }
+        li { margin-bottom: 10px; }
+        .summary, .day-log { margin-top: 20px; }
+    </style>
+</head>
+<body>
+    <h2>Log Work Hours</h2>
+    <form method="post">
+        <input type="date" name="date" value="{{ today }}" required>
+        <input type="time" name="start" required>
+        <input type="time" name="end" required>
+        <button type="submit">Add Entry</button>
+    </form>
+
+    <div class="day-log">
+        <h3>Daily Logs</h3>
+        <ul>
+            {% for d in day_details %}
+            <li>{{ d.date }}: {{ d.start }} to {{ d.end }} = {{ d.hours }} hrs
+                [<a href="/edit/{{ d.id }}">Edit</a>]
+                <form action="/delete/{{ d.id }}" method="post" style="display:inline;">
+                    <button type="submit" onclick="return confirm('Delete this entry?');">Delete</button>
+                </form>
+            </li>
+            {% endfor %}
+        </ul>
+    </div>
+
+    <div class="summary">
+        <h3>Pay Period Summary</h3>
+        <ul>
+            {% for period, data in summary.items() %}
+            <li><strong>{{ period }}</strong>: {{ data.total_hours|round(2) }} hrs → ${{ data.net }} (Paid on {{ data.payday }})</li>
+            {% endfor %}
+        </ul>
+    </div>
+</body>
+</html>
