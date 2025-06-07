@@ -1,20 +1,20 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Edit Entry</title>
-    <style>
-        body { font-family: sans-serif; padding: 20px; max-width: 600px; margin: auto; }
-        input, button { width: 100%; padding: 10px; margin: 5px 0; box-sizing: border-box; }
-    </style>
 </head>
 <body>
     <h2>Edit Work Entry</h2>
     <form method="post">
-        <input type="date" name="date" value="{{ entry.work_date }}" required>
-        <input type="time" name="start" value="{{ entry.start_time }}" required>
-        <input type="time" name="end" value="{{ entry.end_time }}" required>
+        <label>Date:</label><br>
+        <input type="date" name="date" value="{{ entry.work_date }}"><br><br>
+
+        <label>Start Time:</label><br>
+        <input type="time" name="start" required><br><br>
+
+        <label>End Time:</label><br>
+        <input type="time" name="end" required><br><br>
+
         <button type="submit">Update</button>
     </form>
 </body>

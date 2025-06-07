@@ -10,9 +10,11 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db = SQLAlchemy(app)
 
+# Constants
 HOURLY_RATE = 18.0
 TAX_RATE = 0.17
 
+# Database model
 class WorkEntry(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     work_date = db.Column(db.Date, nullable=False)
@@ -22,6 +24,7 @@ class WorkEntry(db.Model):
     def __repr__(self):
         return f"<WorkEntry {self.work_date} {self.start_time}-{self.end_time}>"
 
+# Determine pay period
 def get_pay_period(d):
     if 1 <= d.day <= 15:
         pay_day = date(d.year, d.month, 20)
@@ -41,14 +44,12 @@ def index():
         start_str = request.form['start']
         end_str = request.form['end']
 
-        work_date = datetime.strptime(date_str, '%Y-%m-%d').date()
-        start_time = datetime.strptime(start_str, '%H:%M').time()
-        end_time = datetime.strptime(end_str, '%H:%M').time()
-
-        start_dt = datetime.combine(work_date, start_time)
-        end_dt = datetime.combine(work_date, end_time)
-        if end_dt <= start_dt:
-            end_dt += timedelta(days=1)
+        try:
+            work_date = datetime.strptime(date_str, '%Y-%m-%d').date()
+            start_time = datetime.strptime(start_str, '%H:%M').time()
+            end_time = datetime.strptime(end_str, '%H:%M').time()
+        except ValueError:
+            return "Invalid input format", 400
 
         entry = WorkEntry(work_date=work_date, start_time=start_time, end_time=end_time)
         db.session.add(entry)
@@ -58,12 +59,14 @@ def index():
     entries = WorkEntry.query.order_by(WorkEntry.work_date).all()
     summary = {}
     day_details = []
+
     for entry in entries:
         label, payday = get_pay_period(entry.work_date)
         start_dt = datetime.combine(entry.work_date, entry.start_time)
         end_dt = datetime.combine(entry.work_date, entry.end_time)
         if end_dt <= start_dt:
             end_dt += timedelta(days=1)
+
         hours = (end_dt - start_dt).total_seconds() / 3600
 
         if label not in summary:
@@ -92,10 +95,13 @@ def index():
 def edit_entry(entry_id):
     entry = WorkEntry.query.get_or_404(entry_id)
     if request.method == 'POST':
-        entry.work_date = datetime.strptime(request.form['date'], '%Y-%m-%d').date()
-        entry.start_time = datetime.strptime(request.form['start'], '%H:%M').time()
-        entry.end_time = datetime.strptime(request.form['end'], '%H:%M').time()
-        db.session.commit()
+        try:
+            entry.work_date = datetime.strptime(request.form['date'], '%Y-%m-%d').date()
+            entry.start_time = datetime.strptime(request.form['start'], '%H:%M').time()
+            entry.end_time = datetime.strptime(request.form['end'], '%H:%M').time()
+            db.session.commit()
+        except ValueError:
+            return "Invalid input", 400
         return redirect('/')
     return render_template('edit.html', entry=entry)
 
@@ -110,4 +116,3 @@ if __name__ == '__main__':
     with app.app_context():
         db.create_all()
     app.run(host='0.0.0.0', port=10000)
-
