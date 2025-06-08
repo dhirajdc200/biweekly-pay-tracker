@@ -1,0 +1,15 @@
+body {
+  font-family: 'Segoe UI', sans-serif;
+}
+
+h1, h2, h3 {
+  font-weight: 600;
+}
+
+.card-title {
+  font-size: 1.2rem;
+}
+
+.table th, .table td {
+  vertical-align: middle;
+}
