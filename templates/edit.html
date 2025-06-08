@@ -1,21 +1,23 @@
-<!DOCTYPE html>
+<!doctype html>
 <html>
 <head>
     <title>Edit Entry</title>
 </head>
 <body>
-    <h2>Edit Work Entry</h2>
-    <form method="post">
-        <label>Date:</label><br>
-        <input type="date" name="date" value="{{ entry.work_date }}"><br><br>
+    <h1>Edit Work Entry</h1>
+    <form method="POST">
+        <label>Date:</label>
+        <input type="date" name="date" value="{{ entry.work_date }}" required><br><br>
 
-        <label>Start Time:</label><br>
-        <input type="time" name="start" required><br><br>
+        <label>Start Time:</label>
+        <input type="time" name="start" value="{{ entry.start_time.strftime('%H:%M') }}" required><br><br>
 
-        <label>End Time:</label><br>
-        <input type="time" name="end" required><br><br>
+        <label>End Time:</label>
+        <input type="time" name="end" value="{{ entry.end_time.strftime('%H:%M') }}" required><br><br>
 
         <button type="submit">Update</button>
     </form>
+    <br>
+    <a href="/">← Back to Home</a>
 </body>
 </html>
