@@ -6,7 +6,7 @@ from calendar import monthrange
 app = Flask(__name__)
 app.secret_key = 'your-secret-key'
 
-# DB config
+# Database config
 app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://paytracker_db_user:pjU3ATEfvRDlj00uz5NqBenfFPu9pDCJ@dpg-d12absruibrs73f19tcg-a/paytracker_db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
@@ -50,8 +50,10 @@ def index():
         db.session.commit()
         return redirect('/')
 
-    entries = WorkEntry.query.order_by(WorkEntry.work_date).all()
+    entries = WorkEntry.query.order_by(WorkEntry.work_date.desc()).all()
     summary = {}
+    day_details = []
+
     for entry in entries:
         label, payday = get_pay_period(entry.work_date)
         start_dt = datetime.combine(entry.work_date, entry.start_time)
@@ -60,6 +62,16 @@ def index():
             end_dt += timedelta(days=1)
         hours = (end_dt - start_dt).total_seconds() / 3600
 
+        # Append for daily log
+        day_details.append({
+            'id': entry.id,
+            'date': entry.work_date.strftime('%Y-%m-%d'),
+            'start': entry.start_time.strftime('%H:%M'),
+            'end': entry.end_time.strftime('%H:%M'),
+            'hours': round(hours, 2)
+        })
+
+        # Build pay period summary
         if label not in summary:
             summary[label] = {'total_hours': 0.0, 'payday': payday}
         summary[label]['total_hours'] += hours
@@ -92,7 +104,13 @@ def index():
                 'payday': data['payday']
             })
 
-    return render_template('index.html', unpaid_periods=unpaid_periods, paid_periods=paid_periods, today=date.today())
+    return render_template(
+        'index.html',
+        unpaid_periods=unpaid_periods,
+        paid_periods=paid_periods,
+        day_details=day_details,
+        today=date.today()
+    )
 
 @app.route('/mark_paid/<period_label>', methods=['POST'])
 def mark_paid(period_label):
