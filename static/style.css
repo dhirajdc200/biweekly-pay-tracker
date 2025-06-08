@@ -33,3 +33,33 @@ h1, h2, h3 {
   height: auto;
   border-radius: 8px;
 }
+
+/* Make layout stretch and keep footer at bottom */
+html, body {
+  height: 100%;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+main {
+  flex: 1;
+}
+
+/* Social media icons */
+.social-icons {
+  margin-top: 10px;
+}
+
+.social-icons a {
+  color: #333;
+  margin: 0 10px;
+  font-size: 24px;
+  transition: transform 0.3s ease, color 0.3s ease;
+  text-decoration: none;
+}
+
+.social-icons a:hover {
+  color: #0077b5; /* LinkedIn blue */
+  transform: scale(1.2);
+}
