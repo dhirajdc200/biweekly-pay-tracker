@@ -1,6 +1,7 @@
 from flask import Flask, render_template, request, redirect
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime, date, timedelta
+from calendar import monthrange
 import os
 
 app = Flask(__name__)
@@ -30,11 +31,9 @@ def get_pay_period(d):
         pay_day = date(d.year, d.month, 20)
         label = f"{d.strftime('%Y-%m')}-01_to_15"
     else:
-        if d.month == 12:
-            pay_day = date(d.year + 1, 1, 5)
-        else:
-            pay_day = date(d.year, d.month + 1, 5)
-        label = f"{d.strftime('%Y-%m')}-16_to_end"
+        last_day = monthrange(d.year, d.month)[1]  # Gets the last day of the month dynamically
+        pay_day = date(d.year + 1, 1, 5) if d.month == 12 else date(d.year, d.month + 1, 5)
+        label = f"{d.strftime('%Y-%m')}-16_to_{last_day}"
     return label, pay_day
 
 @app.route('/', methods=['GET', 'POST'])

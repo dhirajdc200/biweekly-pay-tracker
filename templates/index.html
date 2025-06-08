@@ -95,6 +95,34 @@
       icon.style.transform = 'scale(1)';
     });
   });
+
+  // Real-Time Gross Pay Calculation
+  document.querySelector("input[name='end']").addEventListener("change", function() {
+    let startTime = document.querySelector("input[name='start']").value;
+    let endTime = this.value;
+
+    if (startTime && endTime) {
+      let start = new Date("2000-01-01T" + startTime);
+      let end = new Date("2000-01-01T" + endTime);
+
+      if (end > start) {
+        let hoursWorked = (end - start) / (1000 * 60 * 60);
+        let grossPay = hoursWorked * 18.0;
+        document.getElementById("pay-preview").textContent = `Estimated Gross: $${grossPay.toFixed(2)}`;
+      }
+    }
+  });
+
+  // Smooth Fade-In Animation for Cards
+  document.addEventListener("DOMContentLoaded", function() {
+    document.querySelectorAll('.card').forEach(card => {
+      card.style.opacity = "0";
+      setTimeout(() => {
+        card.style.transition = "opacity 0.5s ease-in";
+        card.style.opacity = "1";
+      }, 200);
+    });
+  });
 </script>
 </body>
 </html>
