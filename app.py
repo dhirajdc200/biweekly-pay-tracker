@@ -29,11 +29,11 @@ class WorkEntry(db.Model):
 def get_pay_period(d):
     if 1 <= d.day <= 15:
         pay_day = date(d.year, d.month, 20)
-        label = f"{d.strftime('%Y-%m')}-01_to_15"
+        label = f"{d.strftime('%Y %m %d')} to {date(d.year, d.month, 15).strftime('%d')}"
     else:
-        last_day = monthrange(d.year, d.month)[1]  # Gets the last day of the month dynamically
+        last_day = monthrange(d.year, d.month)[1]
         pay_day = date(d.year + 1, 1, 5) if d.month == 12 else date(d.year, d.month + 1, 5)
-        label = f"{d.strftime('%Y-%m')}-16_to_{last_day}"
+        label = f"{d.strftime('%Y %m 16')} to {date(d.year, d.month, last_day).strftime('%d')}"
     return label, pay_day
 
 @app.route('/', methods=['GET', 'POST'])
