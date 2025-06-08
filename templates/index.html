@@ -33,16 +33,16 @@
 
     <h3>Upcoming Pay Periods</h3>
     <div class="row">
-      {% for period, data in unpaid.items() %}
+      {% for period in unpaid_periods %}
       <div class="col-md-4">
         <div class="card mb-3 shadow">
           <div class="card-body">
-            <h5>{{ period }}</h5>
-            <p>Total Hours: {{ data.total_hours }}<br>
-              Gross Pay: ${{ data.gross }}<br>
-              Estimated Net Pay: ${{ data.net }}<br>
-              Payday: {{ data.payday.strftime('%b %d, %Y') }}</p>
-            <form method="POST" action="{{ url_for('mark_paid', period_label=period) }}">
+            <h5>{{ period.label }}</h5>
+            <p>Total Hours: {{ period.total_hours }}<br>
+              Gross Pay: ${{ period.gross }}<br>
+              Estimated Net Pay: ${{ period.net }}<br>
+              Payday: {{ period.payday.strftime('%b %d, %Y') }}</p>
+            <form method="POST" action="{{ url_for('mark_paid', period_label=period.label) }}">
               <button class="btn btn-success">Mark as Paid</button>
             </form>
           </div>
@@ -53,15 +53,15 @@
 
     <h3>Payment History</h3>
     <div class="row">
-      {% for period, data in paid.items() %}
+      {% for period in paid_periods %}
       <div class="col-md-4">
         <div class="card mb-3 shadow border-success">
           <div class="card-body">
-            <h5>{{ period }} <span class="badge bg-success">Paid</span></h5>
-            <p>Total Hours: {{ data.total_hours }}<br>
-              Gross Pay: ${{ data.gross }}<br>
-              Net Pay: ${{ data.net }}<br>
-              Payday: {{ data.payday.strftime('%b %d, %Y') }}</p>
+            <h5>{{ period.label }} <span class="badge bg-success">Paid</span></h5>
+            <p>Total Hours: {{ period.total_hours }}<br>
+              Gross Pay: ${{ period.gross }}<br>
+              Net Pay: ${{ period.net }}<br>
+              Payday: {{ period.payday.strftime('%b %d, %Y') }}</p>
           </div>
         </div>
       </div>
@@ -97,16 +97,17 @@
       </tbody>
     </table>
   </div>
+
   <footer class="footer">
     <div class="container text-center">
       <p>Created by Dhiraj DC</p>
       <img src="{{ url_for('static', filename='images/IMG_4362.jpg') }}" alt="Dhiraj DC" class="footer-img">
     </div>
     <div class="social-icons">
-        <a href="https://www.instagram.com/dhirajdc200" target="_blank"><i class="fab fa-instagram"></i></a>
-        <a href="https://www.linkedin.com/in/dhirajdc200" target="_blank"><i class="fab fa-linkedin"></i></a>
-        <a href="https://github.com/dhirajdc200" target="_blank"><i class="fab fa-github"></i></a>
-      </div>
+      <a href="https://www.instagram.com/dhirajdc200" target="_blank"><i class="fab fa-instagram"></i></a>
+      <a href="https://www.linkedin.com/in/dhirajdc200" target="_blank"><i class="fab fa-linkedin"></i></a>
+      <a href="https://github.com/dhirajdc200" target="_blank"><i class="fab fa-github"></i></a>
+    </div>
   </footer>
 
 <script>
