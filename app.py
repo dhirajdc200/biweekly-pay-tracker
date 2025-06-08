@@ -29,12 +29,13 @@ class WorkEntry(db.Model):
 def get_pay_period(d):
     if 1 <= d.day <= 15:
         pay_day = date(d.year, d.month, 20)
-        label = f"{d.strftime('%Y %m %d')} to {date(d.year, d.month, 15).strftime('%d')}"
+        label = f"{d.year} {d.month:02d} 01 to 15"
     else:
         last_day = monthrange(d.year, d.month)[1]
         pay_day = date(d.year + 1, 1, 5) if d.month == 12 else date(d.year, d.month + 1, 5)
-        label = f"{d.strftime('%Y %m 16')} to {date(d.year, d.month, last_day).strftime('%d')}"
+        label = f"{d.year} {d.month:02d} 16 to {last_day}"
     return label, pay_day
+
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
