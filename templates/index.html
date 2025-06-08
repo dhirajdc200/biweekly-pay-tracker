@@ -34,7 +34,7 @@
     {% for period, info in summary.items() %}
       <div class="card mb-3 shadow-sm">
         <div class="card-body">
-          <h5 class="card-title">{{ period.replace('_', ' to ').replace('-', ' ') }}</h5>
+          <h5 class="card-title">{{ period.replace('_', ' to ').replace('-', ' ').strip() }}</h5>
           <p class="card-text">
             Total Hours: <strong>{{ info.total_hours | round(2) }}</strong><br>
             Gross Pay: <strong>${{ info.gross }}</strong><br>
