@@ -31,19 +31,42 @@
       </div>
     </form>
 
-    {% for period, info in summary.items() %}
-      <div class="card mb-3 shadow-sm">
-        <div class="card-body">
-          <h5 class="card-title">{{ period.replace('_', ' to ').replace('-', ' ').strip() }}</h5>
-          <p class="card-text">
-            Total Hours: <strong>{{ info.total_hours | round(2) }}</strong><br>
-            Gross Pay: <strong>${{ info.gross }}</strong><br>
-            Estimated Net Pay: <strong>${{ info.net }}</strong><br>
-            Payday: <strong>{{ info.payday.strftime('%b %d, %Y') }}</strong>
-          </p>
+    <h3>Upcoming Pay Periods</h3>
+    <div class="row">
+      {% for period, data in unpaid.items() %}
+      <div class="col-md-4">
+        <div class="card mb-3 shadow">
+          <div class="card-body">
+            <h5>{{ period }}</h5>
+            <p>Total Hours: {{ data.total_hours }}<br>
+              Gross Pay: ${{ data.gross }}<br>
+              Estimated Net Pay: ${{ data.net }}<br>
+              Payday: {{ data.payday.strftime('%b %d, %Y') }}</p>
+            <form method="POST" action="{{ url_for('mark_paid', period_label=period) }}">
+              <button class="btn btn-success">Mark as Paid</button>
+            </form>
+          </div>
         </div>
       </div>
-    {% endfor %}
+      {% endfor %}
+    </div>
+
+    <h3>Payment History</h3>
+    <div class="row">
+      {% for period, data in paid.items() %}
+      <div class="col-md-4">
+        <div class="card mb-3 shadow border-success">
+          <div class="card-body">
+            <h5>{{ period }} <span class="badge bg-success">Paid</span></h5>
+            <p>Total Hours: {{ data.total_hours }}<br>
+              Gross Pay: ${{ data.gross }}<br>
+              Net Pay: ${{ data.net }}<br>
+              Payday: {{ data.payday.strftime('%b %d, %Y') }}</p>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
 
     <h3 class="mt-5">📅 Daily Entries</h3>
     <table class="table table-bordered table-hover bg-white shadow-sm">
