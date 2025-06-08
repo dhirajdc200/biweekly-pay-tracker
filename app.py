@@ -123,6 +123,17 @@ def mark_paid(period_label):
     db.session.commit()
     return redirect('/')
 
+@app.route('/mark_unpaid/<period_label>', methods=['POST'])
+def mark_unpaid(period_label):
+    status = PayPeriodStatus.query.filter_by(label=period_label).first()
+    if status:
+        status.is_paid = False
+        status.paid_on = None
+        db.session.add(status)
+        db.session.commit()
+    return redirect('/')
+
+
 @app.route('/edit/<int:entry_id>', methods=['GET', 'POST'])
 def edit_entry(entry_id):
     entry = WorkEntry.query.get_or_404(entry_id)

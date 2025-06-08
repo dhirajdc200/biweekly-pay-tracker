@@ -62,11 +62,15 @@
               Gross Pay: ${{ period.gross }}<br>
               Net Pay: ${{ period.net }}<br>
               Payday: {{ period.payday.strftime('%b %d, %Y') }}</p>
+            <form method="POST" action="{{ url_for('mark_unpaid', period_label=period.label) }}">
+              <button class="btn btn-warning">Mark as Unpaid</button>
+            </form>
           </div>
         </div>
       </div>
       {% endfor %}
     </div>
+
 
     <h3 class="mt-5">📅 Daily Entries</h3>
     <table class="table table-bordered table-hover bg-white shadow-sm">
