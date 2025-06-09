@@ -9,13 +9,15 @@ app.secret_key = 'your-secret-key'
 # Database config
 app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://paytracker_db_user:pjU3ATEfvRDlj00uz5NqBenfFPu9pDCJ@dpg-d12absruibrs73f19tcg-a/paytracker_db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
+# Initialize database
 db = SQLAlchemy(app)
 
 # Constants
 HOURLY_RATE = 18.0
 TAX_RATE = 0.17
 
-# Database models
+# Models
 class WorkEntry(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     work_date = db.Column(db.Date, nullable=False)
@@ -28,7 +30,16 @@ class PayPeriodStatus(db.Model):
     is_paid = db.Column(db.Boolean, default=False)
     paid_on = db.Column(db.Date)
 
-# Helpers
+class AgencyShift(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    shift_date = db.Column(db.Date, nullable=False)
+    start_time = db.Column(db.Time, nullable=False)
+    end_time = db.Column(db.Time, nullable=False)
+    location = db.Column(db.String, nullable=False)
+    hourly_rate = db.Column(db.Float, nullable=False)
+    break_minutes = db.Column(db.Integer, default=0)
+
+# Helper functions
 def get_pay_period(d):
     if 1 <= d.day <= 15:
         label = f"{d.year} {d.month:02d} 01 to 15"
@@ -39,6 +50,7 @@ def get_pay_period(d):
         pay_day = date(d.year + 1, 1, 5) if d.month == 12 else date(d.year, d.month + 1, 5)
     return label, pay_day
 
+# Routes
 @app.route('/', methods=['GET', 'POST'])
 def index():
     if request.method == 'POST':
@@ -62,7 +74,6 @@ def index():
             end_dt += timedelta(days=1)
         hours = (end_dt - start_dt).total_seconds() / 3600
 
-        # Append for daily log
         day_details.append({
             'id': entry.id,
             'date': entry.work_date.strftime('%Y-%m-%d'),
@@ -71,7 +82,6 @@ def index():
             'hours': round(hours, 2)
         })
 
-        # Build pay period summary
         if label not in summary:
             summary[label] = {'total_hours': 0.0, 'payday': payday}
         summary[label]['total_hours'] += hours
@@ -104,13 +114,7 @@ def index():
                 'payday': data['payday']
             })
 
-    return render_template(
-        'index.html',
-        unpaid_periods=unpaid_periods,
-        paid_periods=paid_periods,
-        day_details=day_details,
-        today=date.today()
-    )
+    return render_template('index.html', unpaid_periods=unpaid_periods, paid_periods=paid_periods, day_details=day_details, today=date.today())
 
 @app.route('/mark_paid/<period_label>', methods=['POST'])
 def mark_paid(period_label):
@@ -133,7 +137,6 @@ def mark_unpaid(period_label):
         db.session.commit()
     return redirect('/')
 
-
 @app.route('/edit/<int:entry_id>', methods=['GET', 'POST'])
 def edit_entry(entry_id):
     entry = WorkEntry.query.get_or_404(entry_id)
@@ -151,6 +154,69 @@ def delete_entry(entry_id):
     db.session.delete(entry)
     db.session.commit()
     return redirect('/')
+
+@app.route('/agency', methods=['GET', 'POST'])
+def agency():
+    if request.method == 'POST':
+        shift_date = datetime.strptime(request.form['date'], '%Y-%m-%d').date()
+        start_time = datetime.strptime(request.form['start'], '%H:%M').time()
+        end_time = datetime.strptime(request.form['end'], '%H:%M').time()
+        location = request.form['location']
+        hourly_rate = float(request.form['rate'])
+        break_minutes = int(request.form['break']) if request.form['break'] else 0
+
+        new_shift = AgencyShift(
+            shift_date=shift_date,
+            start_time=start_time,
+            end_time=end_time,
+            location=location,
+            hourly_rate=hourly_rate,
+            break_minutes=break_minutes
+        )
+        db.session.add(new_shift)
+        db.session.commit()
+        return redirect('/agency')
+
+    shifts = AgencyShift.query.order_by(AgencyShift.shift_date.desc()).all()
+    weekly_summary = {}
+
+    for shift in shifts:
+        week_start = shift.shift_date - timedelta(days=shift.shift_date.weekday())
+        week_label = f"{week_start} to {week_start + timedelta(days=6)}"
+
+        start_dt = datetime.combine(shift.shift_date, shift.start_time)
+        end_dt = datetime.combine(shift.shift_date, shift.end_time)
+        if end_dt <= start_dt:
+            end_dt += timedelta(days=1)
+        total_hours = (end_dt - start_dt).total_seconds() / 3600 - (shift.break_minutes / 60)
+        total_hours = max(0, round(total_hours, 2))
+        gross = total_hours * shift.hourly_rate
+        net = gross * (1 - TAX_RATE)
+
+        if week_label not in weekly_summary:
+            weekly_summary[week_label] = {
+                'total_hours': 0.0,
+                'gross': 0.0,
+                'net': 0.0,
+                'shifts': []
+            }
+
+        weekly_summary[week_label]['total_hours'] += total_hours
+        weekly_summary[week_label]['gross'] += gross
+        weekly_summary[week_label]['net'] += net
+        weekly_summary[week_label]['shifts'].append({
+            'date': shift.shift_date.strftime('%Y-%m-%d'),
+            'location': shift.location,
+            'start': shift.start_time.strftime('%H:%M'),
+            'end': shift.end_time.strftime('%H:%M'),
+            'break': shift.break_minutes,
+            'hours': total_hours,
+            'rate': shift.hourly_rate,
+            'gross': round(gross, 2),
+            'net': round(net, 2)
+        })
+
+    return render_template('agency.html', weekly=weekly_summary)
 
 if __name__ == '__main__':
     with app.app_context():
