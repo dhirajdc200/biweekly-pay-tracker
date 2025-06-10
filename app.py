@@ -162,8 +162,8 @@ def agency():
         start_time = datetime.strptime(request.form['start'], '%H:%M').time()
         end_time = datetime.strptime(request.form['end'], '%H:%M').time()
         location = request.form['location']
-        hourly_rate = float(request.form['rate'])
-        break_minutes = int(request.form['break']) if request.form['break'] else 0
+        hourly_rate = float(request.form['pay_rate'])
+        break_minutes = int(request.form['break_mins', 0]) if request.form['break'] else 0
 
         new_shift = AgencyShift(
             shift_date=shift_date,
@@ -217,6 +217,12 @@ def agency():
         })
 
     return render_template('agency.html', weekly=weekly_summary)
+# @app.route('/delete_agency_shift/<int:shift_id>', methods=['POST'])
+# def delete_agency_shift(shift_id):
+#     shift = AgencyShift.query.get_or_404(shift_id)
+#     db.session.delete(shift)
+#     db.session.commit()
+#     return redirect('/agency')
 
 if __name__ == '__main__':
     with app.app_context():
