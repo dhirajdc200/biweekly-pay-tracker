@@ -162,8 +162,8 @@ def agency():
         start_time = datetime.strptime(request.form['start'], '%H:%M').time()
         end_time = datetime.strptime(request.form['end'], '%H:%M').time()
         location = request.form['location']
-        hourly_rate = float(request.form['pay_rate'])
-        break_minutes = int(request.form['break_mins', 0]) if request.form['break'] else 0
+        hourly_rate = float(request.form['rate'])
+        break_minutes = int(request.form['break']) if request.form['break'] else 0
 
         new_shift = AgencyShift(
             shift_date=shift_date,
