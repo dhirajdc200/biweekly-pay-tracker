@@ -30,14 +30,14 @@ class PayPeriodStatus(db.Model):
     is_paid = db.Column(db.Boolean, default=False)
     paid_on = db.Column(db.Date)
 
-class AgencyShift(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    shift_date = db.Column(db.Date, nullable=False)
-    start_time = db.Column(db.Time, nullable=False)
-    end_time = db.Column(db.Time, nullable=False)
-    location = db.Column(db.String, nullable=False)
-    hourly_rate = db.Column(db.Float, nullable=False)
-    break_minutes = db.Column(db.Integer, default=0)
+# class AgencyShift(db.Model):
+#     id = db.Column(db.Integer, primary_key=True)
+#     shift_date = db.Column(db.Date, nullable=False)
+#     start_time = db.Column(db.Time, nullable=False)
+#     end_time = db.Column(db.Time, nullable=False)
+#     location = db.Column(db.String, nullable=False)
+#     hourly_rate = db.Column(db.Float, nullable=False)
+#     break_minutes = db.Column(db.Integer, default=0)
 
 # Helper functions
 def get_pay_period(d):
