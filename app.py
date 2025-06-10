@@ -217,12 +217,26 @@ def agency():
         })
 
     return render_template('agency.html', weekly=weekly_summary)
-# @app.route('/delete_agency_shift/<int:shift_id>', methods=['POST'])
-# def delete_agency_shift(shift_id):
-#     shift = AgencyShift.query.get_or_404(shift_id)
-#     db.session.delete(shift)
-#     db.session.commit()
-#     return redirect('/agency')
+@app.route('/edit_agency_shift/<int:shift_id>', methods=['GET', 'POST'])
+def edit_agency_shift(shift_id):
+    shift = AgencyShift.query.get_or_404(shift_id)
+    if request.method == 'POST':
+        shift.shift_date = datetime.strptime(request.form['date'], '%Y-%m-%d').date()
+        shift.start_time = datetime.strptime(request.form['start'], '%H:%M').time()
+        shift.end_time = datetime.strptime(request.form['end'], '%H:%M').time()
+        shift.location = request.form['location']
+        shift.hourly_rate = float(request.form['rate'])
+        shift.break_minutes = int(request.form['break']) if request.form['break'] else 0
+        db.session.commit()
+        return redirect('/agency')
+    return render_template('edit_agency.html', shift=shift)
+
+@app.route('/delete_agency_shift/<int:shift_id>', methods=['POST'])
+def delete_agency_shift(shift_id):
+    shift = AgencyShift.query.get_or_404(shift_id)
+    db.session.delete(shift)
+    db.session.commit()
+    return redirect('/agency')
 
 if __name__ == '__main__':
     with app.app_context():
