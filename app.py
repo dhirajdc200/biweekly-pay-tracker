@@ -216,7 +216,7 @@ def agency():
             'net': round(net, 2)
         })
 
-    return render_template('agency.html', weekly=weekly_summary)
+    return render_template('agency.html', weekly=weekly_summary, shifts=shifts)
 @app.route('/edit_agency_shift/<int:shift_id>', methods=['GET', 'POST'])
 def edit_agency_shift(shift_id):
     shift = AgencyShift.query.get_or_404(shift_id)
