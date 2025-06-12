@@ -2,6 +2,7 @@ from flask import Flask, render_template, redirect, url_for, request
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime, date, timedelta
 from calendar import monthrange
+from flask import flash
 # from flask_login import login_required
 # from flask_login import LoginManager, UserMixin, login_user, logout_user, current_user
 
@@ -144,7 +145,8 @@ def mark_unpaid(period_label):
 @app.route('/update_actual_pay/<period_label>', methods=['POST'])
 def update_actual_pay(period_label):
     actual_net = request.form.get('actual_net')
-    pay_period = PayPeriodStatus.query.filter_by(user_id=current_user.id, period_label=period_label).first()
+    pay_period = PayPeriodStatus.query.filter_by(label=period_label).first()
+
 
     if pay_period:
         pay_period.actual_net_pay = float(actual_net)
