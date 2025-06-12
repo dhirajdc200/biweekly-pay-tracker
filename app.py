@@ -2,6 +2,8 @@ from flask import Flask, render_template, redirect, url_for, request
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime, date, timedelta
 from calendar import monthrange
+# from flask_login import login_required
+# from flask_login import LoginManager, UserMixin, login_user, logout_user, current_user
 
 app = Flask(__name__)
 app.secret_key = 'your-secret-key'
@@ -30,6 +32,7 @@ class PayPeriodStatus(db.Model):
     label = db.Column(db.String, unique=True)
     is_paid = db.Column(db.Boolean, default=False)
     paid_on = db.Column(db.Date)
+    actual_net_pay = db.Column(db.Float, nullable=True)
 
 # class AgencyShift(db.Model):
 #     id = db.Column(db.Integer, primary_key=True)
@@ -137,6 +140,22 @@ def mark_unpaid(period_label):
         db.session.add(status)
         db.session.commit()
     return redirect('/')
+
+@app.route('/update_actual_pay/<period_label>', methods=['POST'])
+# @login_required
+def update_actual_pay(period_label):
+    actual_net = request.form.get('actual_net')
+    pay_period = PayPeriodStatus.query.filter_by(user_id=current_user.id, period_label=period_label).first()
+
+    if pay_period:
+        pay_period.actual_net_pay = float(actual_net)
+        db.session.commit()
+        flash(f"Actual pay for {period_label} updated!", "success")
+    else:
+        flash("Pay period not found.", "danger")
+
+    return redirect(url_for('index'))
+
 
 @app.route('/edit/<int:entry_id>', methods=['GET', 'POST'])
 def edit_entry(entry_id):
