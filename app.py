@@ -3,8 +3,9 @@ from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime, date, timedelta
 from calendar import monthrange
 from flask import flash
-# from flask_login import login_required
-# from flask_login import LoginManager, UserMixin, login_user, logout_user, current_user
+from flask_migrate import Migrate
+
+import os
 
 app = Flask(__name__)
 app.secret_key = 'your-secret-key'
@@ -16,6 +17,7 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 # Initialize database
 db = SQLAlchemy(app)
+migrate = Migrate(app, db)
 
 # Constants
 HOURLY_RATE = 18.0
@@ -145,11 +147,17 @@ def mark_unpaid(period_label):
 @app.route('/update_actual_pay/<period_label>', methods=['POST'])
 def update_actual_pay(period_label):
     actual_net = request.form.get('actual_net')
+
+    try:
+        actual_net_value = float(actual_net)
+    except (ValueError, TypeError):
+        flash("Invalid actual net pay value.", "danger")
+        return redirect(url_for('index'))
+
     pay_period = PayPeriodStatus.query.filter_by(label=period_label).first()
 
-
     if pay_period:
-        pay_period.actual_net_pay = float(actual_net)
+        pay_period.actual_net_pay = actual_net_value
         db.session.commit()
         flash(f"Actual pay for {period_label} updated!", "success")
     else:
@@ -262,4 +270,4 @@ def delete_entry(entry_id):
 if __name__ == '__main__':
     with app.app_context():
         db.create_all()
-    app.run(host='0.0.0.0', port=10000)
+    app.run(host='0.0.0.0', port=10000, debug=True)
