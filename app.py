@@ -142,7 +142,6 @@ def mark_unpaid(period_label):
     return redirect('/')
 
 @app.route('/update_actual_pay/<period_label>', methods=['POST'])
-# @login_required
 def update_actual_pay(period_label):
     actual_net = request.form.get('actual_net')
     pay_period = PayPeriodStatus.query.filter_by(user_id=current_user.id, period_label=period_label).first()
