@@ -3,9 +3,9 @@ from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime, date, timedelta
 from calendar import monthrange
 from flask import flash
-from flask_migrate import Migrate
+# from flask_migrate import Migrate
 
-import os
+# import os
 
 app = Flask(__name__)
 app.secret_key = 'your-secret-key'
@@ -17,7 +17,7 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 # Initialize database
 db = SQLAlchemy(app)
-migrate = Migrate(app, db)
+# migrate = Migrate(app, db)
 
 # Constants
 HOURLY_RATE = 18.0
@@ -35,7 +35,7 @@ class PayPeriodStatus(db.Model):
     label = db.Column(db.String, unique=True)
     is_paid = db.Column(db.Boolean, default=False)
     paid_on = db.Column(db.Date)
-    actual_net_pay = db.Column(db.Float, nullable=True)
+    # actual_net_pay = db.Column(db.Float, nullable=True)
 
 # class AgencyShift(db.Model):
 #     id = db.Column(db.Integer, primary_key=True)
@@ -144,26 +144,26 @@ def mark_unpaid(period_label):
         db.session.commit()
     return redirect('/')
 
-@app.route('/update_actual_pay/<period_label>', methods=['POST'])
-def update_actual_pay(period_label):
-    actual_net = request.form.get('actual_net')
+# @app.route('/update_actual_pay/<period_label>', methods=['POST'])
+# def update_actual_pay(period_label):
+#     actual_net = request.form.get('actual_net')
 
-    try:
-        actual_net_value = float(actual_net)
-    except (ValueError, TypeError):
-        flash("Invalid actual net pay value.", "danger")
-        return redirect(url_for('index'))
+#     try:
+#         actual_net_value = float(actual_net)
+#     except (ValueError, TypeError):
+#         flash("Invalid actual net pay value.", "danger")
+#         return redirect(url_for('index'))
 
-    pay_period = PayPeriodStatus.query.filter_by(label=period_label).first()
+#     pay_period = PayPeriodStatus.query.filter_by(label=period_label).first()
 
-    if pay_period:
-        pay_period.actual_net_pay = actual_net_value
-        db.session.commit()
-        flash(f"Actual pay for {period_label} updated!", "success")
-    else:
-        flash("Pay period not found.", "danger")
+#     if pay_period:
+#         pay_period.actual_net_pay = actual_net_value
+#         db.session.commit()
+#         flash(f"Actual pay for {period_label} updated!", "success")
+#     else:
+#         flash("Pay period not found.", "danger")
 
-    return redirect(url_for('index'))
+#     return redirect(url_for('index'))
 
 
 @app.route('/edit/<int:entry_id>', methods=['GET', 'POST'])
