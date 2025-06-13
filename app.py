@@ -32,6 +32,19 @@ class PayPeriodStatus(db.Model):
     is_paid = db.Column(db.Boolean, default=False)
     paid_on = db.Column(db.Date)
 
+# Helper function for greeting
+def get_time_based_greeting(name):
+    current_hour = datetime.now().hour
+    
+    if 5 <= current_hour < 12:
+        return f"🌞 Good morning, {name}!"
+    elif 12 <= current_hour < 17:
+        return f"☀️ Good afternoon, {name}!"
+    elif 17 <= current_hour < 21:
+        return f"🌆 Good evening, {name}!"
+    else:
+        return f"🌙 Good night, {name}!"
+    
 # Helper functions
 def get_pay_period(d):
     if 1 <= d.day <= 15:
@@ -46,6 +59,8 @@ def get_pay_period(d):
 # Routes
 @app.route('/', methods=['GET', 'POST'])
 def index():
+    greeting = get_time_based_greeting("Dhiraj")
+
     if request.method == 'POST':
         work_date = datetime.strptime(request.form['date'], '%Y-%m-%d').date()
         start_time = datetime.strptime(request.form['start'], '%H:%M').time()
@@ -107,7 +122,7 @@ def index():
                 'payday': data['payday']
             })
 
-    return render_template('index.html', unpaid_periods=unpaid_periods, paid_periods=paid_periods, day_details=day_details, today=date.today())
+    return render_template('index.html', greeting=greeting, unpaid_periods=unpaid_periods, paid_periods=paid_periods, day_details=day_details, today=date.today())
 
 @app.route('/mark_paid/<period_label>', methods=['POST'])
 def mark_paid(period_label):

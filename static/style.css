@@ -6,6 +6,21 @@ h1, h2, h3 {
   font-weight: 600;
 }
 
+.greeting-banner {
+    background: linear-gradient(90deg, #4b6cb7, #182848);
+    color: white;
+    padding: 1rem;
+    border-radius: 8px;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+.greeting-banner .current-date {
+    opacity: 0.8;
+    font-size: 0.9em;
+    float: right;
+}
+
 .card {
   border-radius: 12px;
   box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
