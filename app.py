@@ -1,8 +1,7 @@
-from flask import Flask, render_template, redirect, url_for, request
+from flask import Flask, render_template, redirect, request
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime, date, timedelta
 from calendar import monthrange
-from flask import flash
 
 app = Flask(__name__)
 app.secret_key = 'your-secret-key'
@@ -32,15 +31,6 @@ class PayPeriodStatus(db.Model):
     label = db.Column(db.String, unique=True)
     is_paid = db.Column(db.Boolean, default=False)
     paid_on = db.Column(db.Date)
-
-# class AgencyShift(db.Model):
-#     id = db.Column(db.Integer, primary_key=True)
-#     shift_date = db.Column(db.Date, nullable=False)
-#     start_time = db.Column(db.Time, nullable=False)
-#     end_time = db.Column(db.Time, nullable=False)
-#     location = db.Column(db.String, nullable=False)
-#     hourly_rate = db.Column(db.Float, nullable=False)
-#     break_minutes = db.Column(db.Integer, default=0)
 
 # Helper functions
 def get_pay_period(d):
@@ -158,89 +148,6 @@ def delete_entry(entry_id):
     db.session.delete(entry)
     db.session.commit()
     return redirect('/')
-
-# @app.route('/agency', methods=['GET', 'POST'])
-# def agency():
-#     if request.method == 'POST':
-#         shift_date = datetime.strptime(request.form['date'], '%Y-%m-%d').date()
-#         start_time = datetime.strptime(request.form['start'], '%H:%M').time()
-#         end_time = datetime.strptime(request.form['end'], '%H:%M').time()
-#         location = request.form['location']
-#         hourly_rate = float(request.form['rate'])
-#         break_minutes = int(request.form['break']) if request.form['break'] else 0
-
-#         new_shift = AgencyShift(
-#             shift_date=shift_date,
-#             start_time=start_time,
-#             end_time=end_time,
-#             location=location,
-#             hourly_rate=hourly_rate,
-#             break_minutes=break_minutes
-#         )
-#         db.session.add(new_shift)
-#         db.session.commit()
-#         return redirect('/agency')
-
-#     shifts = AgencyShift.query.order_by(AgencyShift.shift_date.desc()).all()
-#     weekly_summary = {}
-
-#     for shift in shifts:
-#         week_start = shift.shift_date - timedelta(days=shift.shift_date.weekday())
-#         week_label = f"{week_start} to {week_start + timedelta(days=6)}"
-
-#         start_dt = datetime.combine(shift.shift_date, shift.start_time)
-#         end_dt = datetime.combine(shift.shift_date, shift.end_time)
-#         if end_dt <= start_dt:
-#             end_dt += timedelta(days=1)
-#         total_hours = (end_dt - start_dt).total_seconds() / 3600 - (shift.break_minutes / 60)
-#         total_hours = max(0, round(total_hours, 2))
-#         gross = total_hours * shift.hourly_rate
-#         net = gross * (1 - TAX_RATE)
-
-#         if week_label not in weekly_summary:
-#             weekly_summary[week_label] = {
-#                 'total_hours': 0.0,
-#                 'gross': 0.0,
-#                 'net': 0.0,
-#                 'shifts': []
-#             }
-
-#         weekly_summary[week_label]['total_hours'] += total_hours
-#         weekly_summary[week_label]['gross'] += gross
-#         weekly_summary[week_label]['net'] += net
-#         weekly_summary[week_label]['shifts'].append({
-#             'date': shift.shift_date.strftime('%Y-%m-%d'),
-#             'location': shift.location,
-#             'start': shift.start_time.strftime('%H:%M'),
-#             'end': shift.end_time.strftime('%H:%M'),
-#             'break': shift.break_minutes,
-#             'hours': total_hours,
-#             'rate': shift.hourly_rate,
-#             'gross': round(gross, 2),
-#             'net': round(net, 2)
-#         })
-
-#     return render_template('agency.html', weekly=weekly_summary, shifts=shifts)
-# @app.route('/edit_agency_shift/<int:shift_id>', methods=['GET', 'POST'])
-# def edit_agency_shift(shift_id):
-#     shift = AgencyShift.query.get_or_404(shift_id)
-#     if request.method == 'POST':
-#         shift.shift_date = datetime.strptime(request.form['date'], '%Y-%m-%d').date()
-#         shift.start_time = datetime.strptime(request.form['start'], '%H:%M').time()
-#         shift.end_time = datetime.strptime(request.form['end'], '%H:%M').time()
-#         shift.location = request.form['location']
-#         shift.hourly_rate = float(request.form['rate'])
-#         shift.break_minutes = int(request.form['break']) if request.form['break'] else 0
-#         db.session.commit()
-#         return redirect('/agency')
-#     return render_template('edit_agency.html', shift=shift)
-
-# @app.route('/delete_agency_shift/<int:shift_id>', methods=['POST'])
-# def delete_agency_shift(shift_id):
-#     shift = AgencyShift.query.get_or_404(shift_id)
-#     db.session.delete(shift)
-#     db.session.commit()
-#     return redirect('/agency')
 
 if __name__ == '__main__':
     with app.app_context():
