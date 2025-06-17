@@ -34,8 +34,10 @@ class PayPeriodStatus(db.Model):
 
 # Helper function for greeting
 def get_time_based_greeting(name):
-    current_hour = datetime.now().hour
-    
+    now = datetime.now()
+    print("System time (raw):", now)  # This will print in the terminal when you run the app
+    current_hour = now.hour
+
     if 5 <= current_hour < 12:
         return f"🌞 Good morning, {name}!"
     elif 12 <= current_hour < 17:
@@ -44,6 +46,7 @@ def get_time_based_greeting(name):
         return f"🌆 Good evening, {name}!"
     else:
         return f"🌙 Good night, {name}!"
+
     
 # Helper functions
 def get_pay_period(d):
