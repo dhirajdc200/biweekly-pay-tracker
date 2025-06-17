@@ -2,6 +2,7 @@ from flask import Flask, render_template, redirect, request
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime, date, timedelta
 from calendar import monthrange
+from zoneinfo import ZoneInfo
 
 app = Flask(__name__)
 app.secret_key = 'your-secret-key'
@@ -34,10 +35,9 @@ class PayPeriodStatus(db.Model):
 
 # Helper function for greeting
 def get_time_based_greeting(name):
-    now = datetime.now()
-    print("System time (raw):", now)  # This will print in the terminal when you run the app
-    current_hour = now.hour
-
+    toronto_time = datetime.now(ZoneInfo("America/Toronto"))
+    current_hour = toronto_time.hour
+    
     if 5 <= current_hour < 12:
         return f"🌞 Good morning, {name}!"
     elif 12 <= current_hour < 17:
