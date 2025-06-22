@@ -78,6 +78,13 @@
             <form method="POST" action="{{ url_for('mark_unpaid', period_label=period.label) }}">
               <button class="btn btn-warning">Mark as Unpaid</button>
             </form>
+            <form method="POST" action="{{ url_for('update_actual_payment', period_label=period.label) }}">
+              <div class="mb-2">
+                <label for="actual_{{ period.label }}">Actual Received:</label>
+                <input type="number" step="0.01" name="actual_received" value="{{ period.actual_received or '' }}" class="form-control">
+              </div>
+              <button class="btn btn-info btn-sm">Update Actual</button>
+            </form>            
 
           </div>
         </div>

@@ -14,7 +14,6 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 # Initialize database
 db = SQLAlchemy(app)
-# migrate = Migrate(app, db)
 
 # Constants
 HOURLY_RATE = 18.0
@@ -32,6 +31,8 @@ class PayPeriodStatus(db.Model):
     label = db.Column(db.String, unique=True)
     is_paid = db.Column(db.Boolean, default=False)
     paid_on = db.Column(db.Date)
+    actual_received = db.Column(db.Float)  # NEW FIELD
+
 
 # Helper function for greeting
 def get_time_based_greeting(name):
@@ -122,7 +123,8 @@ def index():
                 'gross': data['gross'],
                 'net': data['net'],
                 'payday': data['payday'],
-                'paid_on': status.paid_on.strftime('%Y-%m-%d')
+                'paid_on': status.paid_on.strftime('%Y-%m-%d'),
+                'actual_received': round(status.actual_received, 2) if status.actual_received else None
             })
         else:
             unpaid_periods.append({
@@ -157,6 +159,16 @@ def mark_unpaid(period_label):
         db.session.add(status)
         db.session.commit()
     return redirect('/')
+
+@app.route('/update_actual/<period_label>', methods=['POST'])
+def update_actual_payment(period_label):
+    actual_amount = request.form.get('actual_received', type=float)
+    status = PayPeriodStatus.query.filter_by(label=period_label).first()
+    if status:
+        status.actual_received = actual_amount
+        db.session.commit()
+    return redirect('/')
+
 
 
 @app.route('/edit/<int:entry_id>', methods=['GET', 'POST'])
