@@ -48,8 +48,10 @@
           <div class="card-body">
             <h5>{{ period.label }}</h5>
             <p>Total Hours: {{ period.total_hours }}<br>
-              Gross Pay: ${{ period.gross }}<br>
-              Estimated Net Pay: ${{ period.net }}<br>
+              Total Base Pay: ${{ period.total }}<br>
+              Vacation Pay (4%): ${{ period.vacation_pay }}<br>
+              Gross: ${{ period.gross }}<br>
+              Net after Tax: ${{ period.net }}<br>
               Payday: {{ period.payday.strftime('%b %d, %Y') }}</p>
             <form method="POST" action="{{ url_for('mark_paid', period_label=period.label) }}">
               <button class="btn btn-success">Mark as Paid</button>
@@ -68,8 +70,10 @@
           <div class="card-body">
             <h5>{{ period.label }} <span class="badge bg-success">Paid</span></h5>
             <p>Total Hours: {{ period.total_hours }}<br>
-              Gross Pay: ${{ period.gross }}<br>
-              Net Pay: ${{ period.net }}<br>
+              Total Base Pay: ${{ period.total }}<br>
+              Vacation Pay (4%): ${{ period.vacation_pay }}<br>
+              Gross: ${{ period.gross }}<br>
+              Net after Tax: ${{ period.net }}<br>
               Payday: {{ period.payday.strftime('%b %d, %Y') }}</p>
             <form method="POST" action="{{ url_for('mark_unpaid', period_label=period.label) }}">
               <button class="btn btn-warning">Mark as Unpaid</button>
