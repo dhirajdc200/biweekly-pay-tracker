@@ -31,8 +31,6 @@ class PayPeriodStatus(db.Model):
     label = db.Column(db.String, unique=True)
     is_paid = db.Column(db.Boolean, default=False)
     paid_on = db.Column(db.Date)
-    actual_received = db.Column(db.Float)  # NEW FIELD
-
 
 # Helper function for greeting
 def get_time_based_greeting(name):
