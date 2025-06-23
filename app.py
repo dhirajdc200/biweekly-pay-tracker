@@ -151,16 +151,6 @@ def mark_unpaid(period_label):
         db.session.commit()
     return redirect('/')
 
-@app.route('/update_actual/<period_label>', methods=['POST'])
-def update_actual_payment(period_label):
-    actual_amount = request.form.get('actual_received', type=float)
-    status = PayPeriodStatus.query.filter_by(label=period_label).first()
-    if status:
-        status.actual_received = actual_amount
-        db.session.commit()
-    return redirect('/')
-
-
 
 @app.route('/edit/<int:entry_id>', methods=['GET', 'POST'])
 def edit_entry(entry_id):
