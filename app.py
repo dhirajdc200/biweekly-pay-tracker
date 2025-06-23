@@ -102,13 +102,9 @@ def index():
     paid_periods = []
 
     for label, data in summary.items():
-        total = round(data['total_hours'] * HOURLY_RATE, 2)
-        vacation_pay = round(0.04 * total, 2)
-        gross = round(total + vacation_pay, 2)
+        gross = round(data['total_hours'] * HOURLY_RATE, 2)
         net = round(gross * (1 - TAX_RATE), 2)
 
-        data['total'] = total
-        data['vacation_pay'] = vacation_pay
         data['gross'] = gross
         data['net'] = net
 
@@ -118,20 +114,15 @@ def index():
             paid_periods.append({
                 'label': label,
                 'total_hours': round(data['total_hours'], 2),
-                'total': data['total'],
-                'vacation_pay': data['vacation_pay'],
                 'gross': data['gross'],
                 'net': data['net'],
                 'payday': data['payday'],
-                'paid_on': status.paid_on.strftime('%Y-%m-%d'),
-                'actual_received': round(status.actual_received, 2) if status.actual_received else None
+                'paid_on': status.paid_on.strftime('%Y-%m-%d')
             })
         else:
             unpaid_periods.append({
                 'label': label,
                 'total_hours': round(data['total_hours'], 2),
-                'total': data['total'],
-                'vacation_pay': data['vacation_pay'],
                 'gross': data['gross'],
                 'net': data['net'],
                 'payday': data['payday']

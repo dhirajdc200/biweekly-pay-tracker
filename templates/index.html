@@ -48,8 +48,6 @@
           <div class="card-body">
             <h5>{{ period.label }}</h5>
             <p>Total Hours: {{ period.total_hours }}<br>
-              Total Base Pay: ${{ period.total }}<br>
-              Vacation Pay (4%): ${{ period.vacation_pay }}<br>
               Gross: ${{ period.gross }}<br>
               Net after Tax: ${{ period.net }}<br>
               Payday: {{ period.payday.strftime('%b %d, %Y') }}</p>
@@ -70,21 +68,12 @@
           <div class="card-body">
             <h5>{{ period.label }} <span class="badge bg-success">Paid</span></h5>
             <p>Total Hours: {{ period.total_hours }}<br>
-              Total Base Pay: ${{ period.total }}<br>
-              Vacation Pay (4%): ${{ period.vacation_pay }}<br>
               Gross: ${{ period.gross }}<br>
               Net after Tax: ${{ period.net }}<br>
               Payday: {{ period.payday.strftime('%b %d, %Y') }}</p>
             <form method="POST" action="{{ url_for('mark_unpaid', period_label=period.label) }}">
               <button class="btn btn-warning">Mark as Unpaid</button>
-            </form>
-            <form method="POST" action="{{ url_for('update_actual_payment', period_label=period.label) }}">
-              <div class="mb-2">
-                <label for="actual_{{ period.label }}">Actual Received:</label>
-                <input type="number" step="0.01" name="actual_received" value="{{ period.actual_received or '' }}" class="form-control">
-              </div>
-              <button class="btn btn-info btn-sm">Update Actual</button>
-            </form>            
+            </form>          
 
           </div>
         </div>
